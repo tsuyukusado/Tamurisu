@@ -1,0 +1,7 @@
+.task-list button {
+  margin-left: auto;
+  color: red;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

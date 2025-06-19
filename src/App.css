@@ -1,38 +1,134 @@
-.App {
+/* === ベース設定 === */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  height: 100%;
+  background: #fff;
+  overflow-x: hidden;
+}
+
+/* === アプリ全体 === */
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 80px 20px 60px; /* 上にヘッダー分、下にメニュー分の余白 */
+}
+
+/* === ヘッダー固定 === */
+h1 {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding: 10px 0;
+  margin: 0;
+  font-size: 24px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  z-index: 10;
+}
+
+/* === タスクリスト === */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.task-edit {
+  flex: 1;
+  padding: 4px;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+}
+
+.task-edit:focus {
+  outline: none;
+  background: #f9f9f9;
+  border-bottom: 1px dotted #aaa;
+}
+
+.task-input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  border-bottom: none; /* ← 下線を消す主役！ */
+}
+
+/* New Task入力専用の下線なしスタイル */
+.new-task-input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  border-bottom: none;
+}
+
+.task-input:focus {
+  outline: none;
+  border-bottom: 1px dotted #666;
+}
+
+.task-list li.done .task-edit {
+  text-decoration: line-through;
+  color: #888;
+}
+
+/* === メニューバー固定 === */
+.menu-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #f8f8f8;
+  border-top: 1px solid #ccc;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  z-index: 10;
+}
+
+.popup-menu {
+  position: absolute;
+  bottom: 40px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 999;
+}
+
+.completed-view {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.completed-view ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.drag-handle {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-right: 0.5rem;
+  cursor: grab;
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.drag-handle svg {
+  font-size: 1.1rem;
 }

@@ -1,25 +1,344 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useRef, useEffect } from "react";
+import { FaSearch } from "react-icons/fa";
+import TaskDetail from "./components/TaskDetail";
+import TaskList from "./components/TaskList";
+import CompletedTasks from "./components/CompletedTasks";
+import OthersView from "./components/OthersView";
+import MenuBar from "./components/MenuBar";
+import TagGraphView from "./components/TagGraphView";
+import RecordPage from "./components/RecordPage";
+import SearchBar from "./components/SearchBar";
+import DetailGraph from "./components/DetailGraph";
+import CalendarView from "./components/CalendarView";
+import "./App.css";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/ja";
+import weekday from "dayjs/plugin/weekday";
+import localeData from "dayjs/plugin/localeData";
+import updateLocale from "dayjs/plugin/updateLocale";
+
+dayjs.extend(updateLocale);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.locale("ja");
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+  const [tasks, setTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
+  const [newTask, setNewTask] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
+  const [view, setView] = useState("tasks");
+  const [subView, setSubView] = useState(null);
+  const [removingId, setRemovingId] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchTagFilter, setSearchTagFilter] = useState("");
+  const inputRef = useRef();
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const [tagFilter, setTagFilter] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [taskRecords, setTaskRecords] = useState(() => {
+    return JSON.parse(localStorage.getItem("taskRecords")) || {};
+  });
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [selectedTag, setSelectedTag] = useState(null);
+
+  useEffect(() => {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    const storedCompleted = JSON.parse(localStorage.getItem("completedTasks")) || [];
+    const storedRecords = JSON.parse(localStorage.getItem("taskRecords")) || {};
+    setTasks(storedTasks);
+    setCompletedTasks(storedCompleted);
+    setTaskRecords(storedRecords);
+    setIsInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  }, [tasks, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
+    }
+  }, [completedTasks, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("taskRecords", JSON.stringify(taskRecords));
+    }
+  }, [taskRecords, isInitialized]);
+
+  useEffect(() => {
+    if (!showSearchBar) {
+      setSearchKeyword("");
+      setSearchTagFilter("");
+      setDateFrom("");
+      setDateTo("");
+    }
+  }, [showSearchBar]);
+
+  const toggleSearch = () => {
+    const newValue = !showSearchBar;
+    setShowSearchBar(newValue);
+    if (!newValue) {
+      setSearchKeyword("");
+      setSearchTagFilter("");
+      setDateFrom("");
+      setDateTo("");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !isComposing && newTask.trim() !== "") {
+      const text = newTask.trim();
+      const defaultTags = searchTagFilter.trim()
+        ? searchTagFilter.trim().split(/[,　\s]+/).filter(Boolean)
+        : [];
+      setTasks([...tasks, {
+        id: Date.now(),
+        title: text,
+        completed: false,
+        tags: defaultTags,
+        dueDate: null
+      }]);
+      setNewTask("");
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const newTasks = Array.from(tasks);
+    const [movedItem] = newTasks.splice(result.source.index, 1);
+    newTasks.splice(result.destination.index, 0, movedItem);
+    setTasks(newTasks);
+  };
+
+  const updateTask = (updatedTask) => {
+    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
+  };
+
+  const toggleTask = (id) => {
+    setRemovingId(id);
+    setTimeout(() => {
+      const target = tasks.find(t => t.id === id);
+      if (!target) return;
+      setTasks(tasks.filter(t => t.id !== id));
+      setCompletedTasks(prev => [...prev, { ...target, completed: true }]);
+      setRemovingId(null);
+    }, 300);
+  };
+
+  const restoreTask = (id) => {
+    setRemovingId(id);
+    setTimeout(() => {
+      const target = completedTasks.find(t => t.id === id);
+      if (!target) return;
+      setCompletedTasks(completedTasks.filter(t => t.id !== id));
+      setTasks([...tasks, { ...target, completed: false }]);
+      setRemovingId(null);
+    }, 300);
+  };
+
+  const deleteTask = (id) => {
+    setRemovingId(id);
+    setTimeout(() => {
+      if (view === "others" && subView === "completed") {
+        setCompletedTasks(prev => prev.filter(t => t.id !== id));
+      } else {
+        setTasks(prev => prev.filter(t => t.id !== id));
+      }
+      setRemovingId(null);
+    }, 300);
+  };
+
+  const viewTitles = {
+    others: subView === "completed" ? "完了済みタスク" : "その他",
+    today: "Today",
+    tasks: "Tasks",
+    record: "記録",
+    calendar: "カレンダー",
+    graph: "グラフ",
+    detail: "Tasks"
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    const keywordWords = searchKeyword.trim().split(/\s+/).filter(Boolean);
+    const tagWords = searchTagFilter.trim().split(/\s+/).filter(Boolean);
+
+    const matchesKeyword = keywordWords.length === 0 || keywordWords.every(word =>
+      (task.title || "").includes(word) || (task.tags || []).some(tag => tag.includes(word))
+    );
+
+    const matchesTag = tagWords.length === 0 || tagWords.every(word =>
+      (task.tags || []).some(tag => tag.includes(word))
+    );
+
+    const taskDate = task.dueDate ? new Date(task.dueDate) : null;
+    const fromDate = dateFrom ? new Date(dateFrom) : null;
+    const toDate = dateTo ? new Date(dateTo) : null;
+
+    const matchesDate = !taskDate || (
+      (!fromDate || taskDate >= fromDate) &&
+      (!toDate || taskDate <= toDate)
+    );
+
+    return matchesKeyword && matchesTag && matchesDate;
+  });
+
+  const renderView = () => {
+    if (view === "detail" && selectedTask) {
+      return (
+        <TaskDetail
+          task={selectedTask}
+          onClose={() => setView("tasks")}
+          onUpdate={updateTask}
+          onUpdateTags={(id, newTags) => {
+            const updatedTask = tasks.find(t => t.id === id);
+            if (!updatedTask) return;
+            updateTask({ ...updatedTask, tags: newTags });
+          }}
+        />
+      );
+    }
+
+    if (view === "record") {
+      return (
+        <RecordPage
+          tasks={tasks}
+          taskRecords={taskRecords}
+          setTaskRecords={setTaskRecords}
+        />
+      );
+    }
+
+    if (view === "graph") {
+      return selectedTag ? (
+        <DetailGraph
+          tag={selectedTag}
+          tasks={tasks}
+          completedTasks={completedTasks}
+          taskRecords={taskRecords}
+        />
+      ) : (
+        <TagGraphView
+          tasks={tasks}
+          completedTasks={completedTasks}
+          taskRecords={taskRecords}
+          onTagClick={(tag) => setSelectedTag(tag)}
+        />
+      );
+    }
+
+    if (view === "calendar") {
+      return (
+<CalendarView
+  onDateSelect={(dateStr) => {
+    setView("tasks");
+    setDateFrom(dateStr);
+    setDateTo(dateStr);
+    setShowSearchBar(true);
+  }}
+/>
+      );
+    }
+
+    if (view === "others") {
+      if (subView === "completed") {
+        return (
+          <CompletedTasks
+            completedTasks={completedTasks}
+            restoreTask={restoreTask}
+            deleteTask={deleteTask}
+            setSubView={setSubView}
+          />
+        );
+      } else {
+        return <OthersView setSubView={setSubView} />;
+      }
+    }
+
+    if (view === "tasks") {
+      return (
+        <>
+          {showSearchBar && (
+            <SearchBar
+              keyword={searchKeyword}
+              setKeyword={setSearchKeyword}
+              tagFilter={searchTagFilter}
+              setTagFilter={setSearchTagFilter}
+              dateFrom={dateFrom}
+              setDateFrom={setDateFrom}
+              dateTo={dateTo}
+              setDateTo={setDateTo}
+            />
+          )}
+          <TaskList
+            tasks={filteredTasks}
+            removingId={removingId}
+            setSelectedTask={setSelectedTask}
+            setView={setView}
+            toggleTask={toggleTask}
+            deleteTask={deleteTask}
+            newTask={newTask}
+            setNewTask={setNewTask}
+            handleKeyDown={handleKeyDown}
+            inputRef={inputRef}
+            setIsComposing={setIsComposing}
+            handleDragEnd={handleDragEnd}
+          />
+        </>
+      );
+    }
+
+    return <div style={{ padding: "1rem" }}>🚧 機能準備中 ({view})</div>;
+  };
+
+return (
+  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
+    <div className="app">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>{viewTitles[view]}</h1>
+        <FaSearch
+          size={20}
+          style={{ cursor: "pointer" }}
+          onClick={() => {
+            if (view === "tasks") {
+              const newValue = !showSearchBar;
+              setShowSearchBar(newValue);
+              if (!newValue) {
+                setSearchKeyword("");
+                setSearchTagFilter("");
+              }
+            } else {
+              setView("tasks");
+            }
+          }}
+        />
+      </div>
+
+      {renderView()}
+
+      <MenuBar
+        view={view}
+        setView={(v) => {
+          setView(v);
+          if (v === "graph") {
+            setSelectedTag(null);
+          }
+        }}
+        setSubView={setSubView}
+      />
     </div>
-  );
-}
+  </LocalizationProvider>
+);}
 
 export default App;

@@ -1,0 +1,29 @@
+.seamless-input {
+  width: 100%;
+  padding: 0.5rem 0;
+  border: none;
+  border-bottom: none;
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 0.75rem;
+  box-shadow: none;
+}
+
+.task-list {
+  padding-left: 1rem; /* ← 全体のインデント */
+}
+
+.task-row {
+  padding: 0.75rem;
+  padding-left: 1rem; /* ← 各アイテムの左インデント */
+  border-left: 3px solid #eee; /* ← オシャレな左線（好みで） */
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.task-row:hover {
+  background: #f9f9f9;
+}

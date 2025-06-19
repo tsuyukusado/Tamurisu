@@ -1,0 +1,22 @@
+.restore-button {
+  background-color: white;
+  color: green !important;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: white;
+  color: red;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-group {
+  margin-top: 8px;
+}

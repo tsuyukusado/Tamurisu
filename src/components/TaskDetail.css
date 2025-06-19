@@ -1,0 +1,113 @@
+.task-title {
+  flex: 1;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.task-row {
+  display: flex;
+  align-items: center; /* ← これがポイント！ */
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.tag-pill {
+  background-color: #71A4D9;
+  color: white;
+  border-radius: 999px;
+  padding: 4px 10px 4px 12px;
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.tag-delete-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.seamless-input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  padding: 6px 0;
+  width: 100%;
+  outline: none;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.seamless-btn {
+  border: none;
+  background: none;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* タグ区切り線（全体の線）を薄い色に */
+.tag-divider {
+  border: none;
+  border-top: 1px solid #ddd; /* 薄いグレーに変更 */
+  margin: 1rem 0;
+}
+
+/* 入力欄の見た目をNotion風に、下線もなしに */
+.tag-input.seamless-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 6px 0;
+  font-size: 0.95rem;
+  background: transparent;
+  margin-top: 0.5rem;
+  box-shadow: none;         /* 下線になる影も消す */
+}
+
+.close-btn {
+  display: block;        /* ブロック化して右端へ */
+  margin-left: auto;     /* 右寄せ */
+  color: #333;           /* Notion っぽい控えめカラー */
+  background: none;      /* シームレス */
+  border: none;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.close-btn:hover {
+  text-decoration: underline; /* さりげないホバー */
+}
+
+.task-title-input {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  border: none;
+  outline: none;
+  width: 100%;
+  background: transparent;
+}
+
+.record-time-input {
+  font-size: 0.9rem;
+  color: #666;
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-top: 0.5rem;
+}
