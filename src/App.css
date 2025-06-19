@@ -132,3 +132,31 @@ h1 {
 .drag-handle svg {
   font-size: 1.1rem;
 }
+
+/* App.css に以下を追加（全体に影響） */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 80px 20px 60px;
+}
+
+.calendar-wrapper {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+/* FullCalendar のツールバーを中央600px幅に制限 */
+.fc-header-toolbar {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px; /* 任意で余白追加 */
+}

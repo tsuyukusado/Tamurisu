@@ -1,4 +1,19 @@
+/* ✅ ヘッダー部分は中央600px */
+.calendar-header {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 20px 0;
+}
+
+/* ✅ カレンダー本体は画面幅いっぱいに */
+.calendar-fullwidth {
+  width: 100vw;
+  overflow-x: auto;
+  padding-bottom: 60px; /* メニューバー対策 */
+}
+
 .fc {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
