@@ -48,7 +48,7 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRef
   const totalSeconds = tagTotals.reduce((sum, d) => sum + d.value, 0);
 
   const chartData = {
-    labels: hasData ? tagTotals.map((d) => d.name) : ["データなし"],
+    labels: hasData ? tagTotals.map((d) => d.name) : ["No Data"],
     datasets: [
       {
         data: hasData ? tagTotals.map((d) => d.value) : [1],
@@ -72,7 +72,7 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRef
       tooltip: {
         callbacks: {
           label: (ctx) => {
-            if (!hasData) return "データなし";
+            if (!hasData) return "No Data";
             const value = ctx.raw;
             return `${ctx.label}: ${formatTime(value)}`;
           },
