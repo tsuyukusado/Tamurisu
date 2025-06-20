@@ -18,7 +18,8 @@ function TaskList({
   deleteTask,
   handleDragEnd,
   setSelectedTask,
-  setView
+  setView,
+  showSearchBar // ← 追加
 }) {
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
@@ -66,16 +67,16 @@ function TaskList({
             </AnimatePresence>
             {provided.placeholder}
 <li>
-  <input
-    ref={inputRef}
-    className="task-input new-task-input"  // ← 追加クラス名をつける！
-    placeholder="New Task..."
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onCompositionStart={() => setIsComposing(true)}
-                onCompositionEnd={() => setIsComposing(false)}
-              />
+<input
+  ref={inputRef}
+  className="task-input new-task-input"
+  placeholder={showSearchBar ? "Add task with tags..." : "Add task..."}
+  value={newTask}
+  onChange={(e) => setNewTask(e.target.value)}
+  onKeyDown={handleKeyDown}
+  onCompositionStart={() => setIsComposing(true)}
+  onCompositionEnd={() => setIsComposing(false)}
+/>
             </li>
           </ul>
         )}

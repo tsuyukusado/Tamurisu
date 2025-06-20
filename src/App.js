@@ -305,6 +305,7 @@ if (view === "others") {
               inputRef={inputRef}
               setIsComposing={setIsComposing}
               handleDragEnd={handleDragEnd}
+              showSearchBar={showSearchBar} // ← 追加
             />
           </>
         );
