@@ -4,7 +4,7 @@ import "./TaskDetail.css";
 import HybridDateInput from "./HybridDateInput";
 import BackButton from "./BackButton"; // ✅ 追加
 
-function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
+function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {  // ✅ 追加確認
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState(task.tags || []);
   const [editedTitle, setEditedTitle] = useState(task.title);
@@ -30,19 +30,26 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
     }
   };
 
-  const handleTimeUpdate = () => {
-    const parts = editedTime.split(":" ).map((p) => parseInt(p, 10));
-    if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
-      const totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-      const records = JSON.parse(localStorage.getItem("taskRecords")) || {};
-      records[task.id] = [totalSeconds];
-      localStorage.setItem("taskRecords", JSON.stringify(records));
-      setRecordTime(totalSeconds);
-      setEditedTime(formatTime(totalSeconds));
-    } else {
-      setEditedTime(formatTime(recordTime));
+const handleTimeUpdate = () => {
+  const parts = editedTime.split(":").map((p) => parseInt(p, 10));
+  if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
+    const totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    const records = JSON.parse(localStorage.getItem("taskRecords")) || {};
+    records[task.id] = [totalSeconds];
+    localStorage.setItem("taskRecords", JSON.stringify(records));
+    setRecordTime(totalSeconds);
+    setEditedTime(formatTime(totalSeconds));
+
+    // ✅ 親に通知して状態更新させる
+    if (typeof setTaskRecords === "function") {
+      setTaskRecords(records);
     }
-  };
+
+    onUpdate({ ...task });
+  } else {
+    setEditedTime(formatTime(recordTime));
+  }
+};
 
   const handleDueDateChange = (e) => {
     const date = e.target.value;

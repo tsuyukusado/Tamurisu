@@ -226,6 +226,7 @@ const handleKeyDown = (e) => {
               if (!updatedTask) return;
               updateTask({ ...updatedTask, tags: newTags });
             }}
+            setTaskRecords={setTaskRecords}  // ✅ 渡しているか？？
           />
         );
       }
