@@ -82,21 +82,23 @@ const handleStop = () => {
       </div>
 
 <div style={{ marginBottom: "2rem" }}>
-  <button
-    onClick={isTiming ? handleStop : handleStart}
-    disabled={!selectedTaskId}
-    style={{
-      fontSize: "1.2rem",
-      padding: "0.75rem 2rem",
-      backgroundColor: "#71A4D9", // つゆくさ色で統一
-      color: "white",
-      border: "none",
-      borderRadius: "0.5rem",
-      cursor: "pointer",
-    }}
-  >
-    {isTiming ? "Stop" : "Start"}
-  </button>
+<button
+  onClick={isTiming ? handleStop : handleStart}
+  disabled={!selectedTaskId}
+  style={{
+    fontSize: "1.2rem",
+    padding: "0.75rem 2rem",
+    backgroundColor: selectedTaskId ? "#71A4D9" : "#ccc", // 選択なし→灰色に
+    color: "white",
+    border: "none",
+    borderRadius: "0.5rem",
+    cursor: selectedTaskId ? "pointer" : "not-allowed", // マウスカーソルも変更
+    opacity: selectedTaskId ? 1 : 0.6, // 少し薄くする
+    transition: "background-color 0.2s, opacity 0.2s" // なめらかに
+  }}
+>
+  {isTiming ? "Stop" : "Start"}
+</button>
 </div>
 
       <ul style={{ listStyle: "none", padding: 0 }}>
