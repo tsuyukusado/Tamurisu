@@ -1,4 +1,5 @@
 import React from "react";
+import HybridDateInput from "./HybridDateInput";
 
 function SearchBar({
   keyword,
@@ -8,35 +9,64 @@ function SearchBar({
   dateFrom,
   setDateFrom,
   dateTo,
-  setDateTo
+  setDateTo,
 }) {
   return (
-    <div style={{ padding: "0.5rem" }}>
-      <input
-        type="text"
-        placeholder="キーワードで検索"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        className="seamless-input"
-      />
-      <input
-        type="text"
-        placeholder="タグで絞り込み"
-        value={tagFilter}
-        onChange={(e) => setTagFilter(e.target.value)}
-        className="seamless-input"
-      />
-      <input
-        type="date"
+    <div style={{ padding: "0.5rem 0" }}>
+      {/* キーワード入力 */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          maxWidth: "600px",
+          width: "100%",
+          gap: "0.5rem",
+          marginBottom: "0.5rem",
+        }}
+      >
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          className="seamless-input"
+          placeholder="例:キーワード　小説　執筆"
+          style={{ flex: 1, height: "2rem" }}
+        />
+      </div>
+
+      {/* タグ入力 */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          maxWidth: "600px",
+          width: "100%",
+          gap: "0.5rem",
+          marginBottom: "0.5rem",
+        }}
+      >
+        <input
+          type="text"
+          value={tagFilter}
+          onChange={(e) => setTagFilter(e.target.value)}
+          className="seamless-input"
+          placeholder="例:タグ　小説　執筆"
+          style={{ flex: 1, height: "2rem" }}
+        />
+      </div>
+
+      {/* From日付 */}
+      <HybridDateInput
+        label="From"
         value={dateFrom}
-        onChange={(e) => setDateFrom(e.target.value)}
-        className="seamless-input"
+        onChange={setDateFrom}
       />
-      <input
-        type="date"
+
+      {/* To日付 */}
+      <HybridDateInput
+        label="To"
         value={dateTo}
-        onChange={(e) => setDateTo(e.target.value)}
-        className="seamless-input"
+        onChange={setDateTo}
       />
     </div>
   );

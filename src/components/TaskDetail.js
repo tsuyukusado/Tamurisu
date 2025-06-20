@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import "./TaskDetail.css";
+import HybridDateInput from "./HybridDateInput";
 
 function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
   const [newTag, setNewTag] = useState("");
@@ -108,16 +109,17 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
         }}
       />
 
-      {/* 期日 */}
-      <div className="due-date-section">
-        <label>期日:</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={handleDueDateChange}
-          className="seamless-input"
-        />
-      </div>
+{/* 期日 */}
+<div className="due-date-section" style={{ maxWidth: "600px", marginBottom: "1rem" }}>
+  <HybridDateInput
+    label="To"
+    value={dueDate}
+    onChange={(v) => {
+      setDueDate(v);
+      onUpdate({ ...task, dueDate: v });
+    }}
+  />
+</div>
 
       {/* タグ */}
       {tags.length > 0 && <hr className="tag-divider" />}
