@@ -55,8 +55,8 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRef
         backgroundColor: hasData
           ? [
               "#71a4d9", "#4C6FBF", "#0000FF", "#000080",
-              "#000000", "#505050", "#B0B0B0", "#FFD700",
-              "#FFCC66", // ← 薄橙
+              "#000000", "#505050", "#B0B0B0", "#FFCC66", // ← 薄橙
+              "#FFD700",
               "#FFA500", "#FF69B4",
             ]
           : ["#ccc"],
