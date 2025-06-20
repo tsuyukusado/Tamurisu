@@ -49,14 +49,21 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
     onUpdate({ ...task, dueDate: date });
   };
 
-  const handleAddTag = (e) => {
-    if (e.key === "Enter" && !e.nativeEvent.isComposing && newTag.trim()) {
-      const updated = [...tags, newTag.trim()];
+const handleAddTag = (e) => {
+  if (e.key === "Enter" && !e.nativeEvent.isComposing && newTag.trim()) {
+    const splitTags = newTag
+      .split(/\s+/) // ← 半角スペース、全角スペース、タブなどで分割
+      .map(t => t.trim())
+      .filter(t => t.length > 0 && !tags.includes(t)); // 重複除外
+
+    if (splitTags.length > 0) {
+      const updated = [...tags, ...splitTags];
       setTags(updated);
       onUpdateTags(task.id, updated);
       setNewTag("");
     }
-  };
+  }
+};
 
   const handleDeleteTag = (index) => {
     const updated = tags.filter((_, i) => i !== index);
@@ -137,14 +144,14 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
 
         {tags.length > 0 && <hr className="tag-divider" />}
 
-        <input
-          type="text"
-          placeholder="Add new tag..."
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-          onKeyDown={handleAddTag}
-          className="tag-input seamless-input"
-        />
+<input
+  type="text"
+  placeholder="Add new tag..."
+  value={newTag}
+  onChange={(e) => setNewTag(e.target.value)}
+  onKeyDown={handleAddTag}
+  className="tag-input seamless-input"
+/>
       </div>
 
       <hr className="tag-divider" />
