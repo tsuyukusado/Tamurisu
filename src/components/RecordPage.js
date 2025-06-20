@@ -65,12 +65,11 @@ const handleStop = () => {
     border: "none",
     outline: "none",
     background: "transparent",
-    appearance: "none", // ▼マークを隠す（必要に応じて）
     WebkitAppearance: "none",
     MozAppearance: "none",
   }}
 >
-        <option value="">Select a task</option>
+        <option value="">Select a task▽</option>
         {tasks.map((task) => (
           <option key={task.id} value={task.id}>
             {task.title}
