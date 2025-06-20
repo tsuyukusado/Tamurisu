@@ -12,7 +12,7 @@ function GraphCenterLabel({ hasData, totalSeconds, isDetail = false }) {
     <div
       style={{
         position: "absolute",
-        top: isDetail ? "52%" : "47%", // ← 詳細なら下にずらす
+        top: isDetail ? "47%" : "47%", // ← 詳細なら下にずらす
         left: "50%",
         transform: "translate(-50%, -50%)",
         fontSize: "1rem",

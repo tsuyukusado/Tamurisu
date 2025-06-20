@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import GraphCenterLabel from "./GraphCenterLabel"; // ✅ 追加
+import GraphCenterLabel from "./GraphCenterLabel"; // ✅ 中央表示用
+import BackButton from "./BackButton";             // ✅ 戻るボタン用
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -12,7 +13,7 @@ function formatTime(seconds) {
   return `${h}:${m}:${s}`;
 }
 
-function DetailGraph({ tag, tasks, completedTasks, taskRecords }) {
+function DetailGraph({ tag, tasks, completedTasks, taskRecords, onBack }) { // ✅ onBack 追加
   const taskData = useMemo(() => {
     if (!tag) return [];
     const allTasks = [...tasks, ...completedTasks];
@@ -27,15 +28,6 @@ function DetailGraph({ tag, tasks, completedTasks, taskRecords }) {
       .filter((d) => d.value > 0)
       .sort((a, b) => b.value - a.value);
   }, [tag, tasks, completedTasks, taskRecords]);
-
-  if (taskData.length === 0) {
-    return (
-      <div style={{ padding: "1rem", textAlign: "center" }}>
-        <h3>Tag: {tag}</h3>
-        <p>No records found for this tag.</p>
-      </div>
-    );
-  }
 
   const totalSeconds = taskData.reduce((sum, d) => sum + d.value, 0);
 
@@ -54,34 +46,35 @@ function DetailGraph({ tag, tasks, completedTasks, taskRecords }) {
     ],
   };
 
-return (
-  <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
-    <h3 style={{ textAlign: "center" }}>{tag}</h3>
-    <Doughnut
-      data={chartData}
-      options={{
-        responsive: true,
-        plugins: {
-          legend: { position: "bottom" },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => {
-                const value = ctx.raw;
-                return `${ctx.label}: ${formatTime(value)}`;
+  return (
+    <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
+      <h3 style={{ textAlign: "center" }}>{tag}</h3>
+      <Doughnut
+        data={chartData}
+        options={{
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const value = ctx.raw;
+                  return `${ctx.label}: ${formatTime(value)}`;
+                },
               },
             },
           },
-        },
-        cutout: "50%",
-      }}
-    />
-    <GraphCenterLabel
-      hasData={taskData.length > 0}
-      totalSeconds={taskData.reduce((a, b) => a + b.value, 0)}
-      isDetail={true} // ✅ ここで伝える！
-    />
-  </div>
-);
+          cutout: "50%",
+        }}
+      />
+      <GraphCenterLabel
+        hasData={true}
+        totalSeconds={totalSeconds}
+        isDetail={true}
+      />
+      {onBack && <BackButton onClick={onBack} />} {/* ✅ 下に表示 */}
+    </div>
+  );
 }
 
 export default DetailGraph;

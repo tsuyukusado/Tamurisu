@@ -247,6 +247,7 @@ const handleKeyDown = (e) => {
             tasks={tasks}
             completedTasks={completedTasks}
             taskRecords={taskRecords}
+            onBack={() => setSelectedTag(null)} // ← 状態管理側で
           />
         ) : (
 <TagGraphView
