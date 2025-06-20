@@ -1,6 +1,7 @@
 import React from "react";
 import "./CompletedTasks.css";
 import { AnimatePresence, motion } from "framer-motion";
+import BackButton from "./BackButton"; // ← 追加
 
 function CompletedTasks({
   completedTasks,
@@ -46,9 +47,9 @@ function CompletedTasks({
           ))}
         </AnimatePresence>
 
-        <li className="task-row" onClick={() => setSubView(null)}>
-          <input className="task-edit" value="← Back" readOnly />
-        </li>
+<li className="task-row" style={{ justifyContent: "flex-end" }}>
+  <BackButton onClick={() => setSubView(null)} />
+</li>
       </ul>
     </div>
   );

@@ -2,7 +2,7 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
+import GraphCenterLabel from "./GraphCenterLabel";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function formatTime(seconds) {
@@ -92,25 +92,8 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRef
 
 return (
   <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
-    <Doughnut key={key} data={chartData} options={options} /> {/* ← ここに key をつける！ */}
-    <div
-      style={{
-        position: "absolute",
-        top: "47%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        textAlign: "center",
-        pointerEvents: "none",
-      }}
-    >
-      {hasData ? (
-        <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#333" }}>
-          {formatTime(totalSeconds)}
-        </div>
-      ) : (
-        <div style={{ fontSize: "1rem", color: "#777" }}>データなし</div>
-      )}
-    </div>
+    <Doughnut key={key} data={chartData} options={options} />
+    <GraphCenterLabel hasData={hasData} totalSeconds={totalSeconds} />
   </div>
 );
 }

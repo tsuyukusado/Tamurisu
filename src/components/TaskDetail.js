@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import "./TaskDetail.css";
 import HybridDateInput from "./HybridDateInput";
+import BackButton from "./BackButton"; // ✅ 追加
 
 function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
   const [newTag, setNewTag] = useState("");
@@ -30,7 +31,7 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
   };
 
   const handleTimeUpdate = () => {
-    const parts = editedTime.split(":").map((p) => parseInt(p, 10));
+    const parts = editedTime.split(":" ).map((p) => parseInt(p, 10));
     if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
       const totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
       const records = JSON.parse(localStorage.getItem("taskRecords")) || {};
@@ -49,21 +50,21 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags }) {
     onUpdate({ ...task, dueDate: date });
   };
 
-const handleAddTag = (e) => {
-  if (e.key === "Enter" && !e.nativeEvent.isComposing && newTag.trim()) {
-    const splitTags = newTag
-      .split(/\s+/) // ← 半角スペース、全角スペース、タブなどで分割
-      .map(t => t.trim())
-      .filter(t => t.length > 0 && !tags.includes(t)); // 重複除外
+  const handleAddTag = (e) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing && newTag.trim()) {
+      const splitTags = newTag
+        .split(/\s+/)
+        .map(t => t.trim())
+        .filter(t => t.length > 0 && !tags.includes(t));
 
-    if (splitTags.length > 0) {
-      const updated = [...tags, ...splitTags];
-      setTags(updated);
-      onUpdateTags(task.id, updated);
-      setNewTag("");
+      if (splitTags.length > 0) {
+        const updated = [...tags, ...splitTags];
+        setTags(updated);
+        onUpdateTags(task.id, updated);
+        setNewTag("");
+      }
     }
-  }
-};
+  };
 
   const handleDeleteTag = (index) => {
     const updated = tags.filter((_, i) => i !== index);
@@ -116,17 +117,17 @@ const handleAddTag = (e) => {
         }}
       />
 
-{/* 期日 */}
-<div className="due-date-section" style={{ maxWidth: "600px", marginBottom: "1rem" }}>
-  <HybridDateInput
-    label="To"
-    value={dueDate}
-    onChange={(v) => {
-      setDueDate(v);
-      onUpdate({ ...task, dueDate: v });
-    }}
-  />
-</div>
+      {/* 期日 */}
+      <div className="due-date-section" style={{ maxWidth: "600px", marginBottom: "1rem" }}>
+        <HybridDateInput
+          label="To"
+          value={dueDate}
+          onChange={(v) => {
+            setDueDate(v);
+            onUpdate({ ...task, dueDate: v });
+          }}
+        />
+      </div>
 
       {/* タグ */}
       {tags.length > 0 && <hr className="tag-divider" />}
@@ -144,17 +145,22 @@ const handleAddTag = (e) => {
 
         {tags.length > 0 && <hr className="tag-divider" />}
 
-<input
-  type="text"
-  placeholder="Add new tag..."
-  value={newTag}
-  onChange={(e) => setNewTag(e.target.value)}
-  onKeyDown={handleAddTag}
-  className="tag-input seamless-input"
-/>
+        <input
+          type="text"
+          placeholder="Add new tag..."
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          onKeyDown={handleAddTag}
+          className="tag-input seamless-input"
+        />
       </div>
 
       <hr className="tag-divider" />
+
+      {/* ✅ 戻るボタンを右下に配置 */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
+        <BackButton onClick={onClose} />
+      </div>
     </div>
   );
 }

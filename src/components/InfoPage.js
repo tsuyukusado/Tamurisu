@@ -1,19 +1,22 @@
-// components/InfoPage.js
 import React from "react";
-import "./CompletedTasks.css"; // 共通のUI用CSS（task-listやtask-editなど）
+import "./CompletedTasks.css"; // 再利用CSS
+import BackButton from "./BackButton"; // ✅ 戻るボタンをインポート
 
 function InfoPage({ setSubView }) {
   return (
     <div className="others-view" style={{ padding: "1rem" }}>
       <ul className="task-list">
         <li className="task-row">
-          <input className="task-edit" value="開発者：露草くれよん" readOnly />
+          <input className="task-edit" value="Developer: Tsuyukusa Kureyon" readOnly />
         </li>
         <li className="task-row">
-          <input className="task-edit" value="バージョン：2025/06/20" readOnly />
+          <input className="task-edit" value="Version: 2025/06/20" readOnly />
         </li>
         <li className="task-row">
-          <input className="task-edit" value="問い合わせ：tsuyukusado@gmail.com" readOnly />
+          <input className="task-edit" value="Contact: tsuyukusado@gmail.com" readOnly />
+        </li>
+        <li className="task-row" style={{ justifyContent: "flex-end" }}>
+          <BackButton onClick={() => setSubView(null)} />
         </li>
       </ul>
     </div>
