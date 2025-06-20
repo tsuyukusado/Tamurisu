@@ -12,19 +12,21 @@ function formatTime(seconds) {
   return `${h}:${m}:${s}`;
 }
 
-function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick }) {
+function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRefreshKey }) {
   const [key, setKey] = useState(0);
 
   useEffect(() => {
-    setKey((prev) => prev + 1);
-  }, [tasks, completedTasks, taskRecords]);
+    console.log("graphRefreshKey changed:", graphRefreshKey);
+    setKey((prev) => prev + 1); // ✅ key を更新して再描画トリガー
+  }, [graphRefreshKey]);
 
   const tagTotals = useMemo(() => {
+    console.log("Calculating tagTotals:", { tasks, completedTasks, taskRecords });
     const totals = {};
     const allTasks = [...tasks, ...completedTasks];
 
     allTasks.forEach((task) => {
-      const records = taskRecords[task.id];
+      const records = taskRecords[task.id.toString()];
       if (!records || !task.tags) return;
       const sum = records.reduce((a, b) => a + b, 0);
       task.tags.forEach((tag) => {
@@ -33,11 +35,14 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick }) {
       });
     });
 
-    return Object.entries(totals)
+    const result = Object.entries(totals)
       .filter(([, v]) => v > 0)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
-  }, [tasks, completedTasks, taskRecords]);
+
+    console.log("tagTotals result:", result);
+    return result;
+  }, [tasks, completedTasks, taskRecords, graphRefreshKey]);
 
   const hasData = tagTotals.length > 0;
   const totalSeconds = tagTotals.reduce((sum, d) => sum + d.value, 0);
@@ -83,29 +88,31 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick }) {
     },
   };
 
-  return (
-    <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }} key={key}>
-      <Doughnut data={chartData} options={options} />
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          textAlign: "center",
-          pointerEvents: "none", // ← クリック透過
-        }}
-      >
-        {hasData ? (
-          <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#333" }}>
-            {formatTime(totalSeconds)}
-          </div>
-        ) : (
-          <div style={{ fontSize: "1rem", color: "#777" }}>データなし</div>
-        )}
-      </div>
+  console.log("Rendering Doughnut chart with key:", key);
+
+return (
+  <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
+    <Doughnut key={key} data={chartData} options={options} /> {/* ← ここに key をつける！ */}
+    <div
+      style={{
+        position: "absolute",
+        top: "47%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        textAlign: "center",
+        pointerEvents: "none",
+      }}
+    >
+      {hasData ? (
+        <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#333" }}>
+          {formatTime(totalSeconds)}
+        </div>
+      ) : (
+        <div style={{ fontSize: "1rem", color: "#777" }}>データなし</div>
+      )}
     </div>
-  );
+  </div>
+);
 }
 
 export default TagGraphView;

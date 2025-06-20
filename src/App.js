@@ -56,6 +56,7 @@ function App() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selectedTag, setSelectedTag] = useState(null);
+  const [graphRefreshKey, setGraphRefreshKey] = useState(0); // 🔄 グラフ再描画用
 
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
@@ -239,12 +240,13 @@ function App() {
             taskRecords={taskRecords}
           />
         ) : (
-          <TagGraphView
-            tasks={tasks}
-            completedTasks={completedTasks}
-            taskRecords={taskRecords}
-            onTagClick={(tag) => setSelectedTag(tag)}
-          />
+<TagGraphView
+  tasks={tasks}
+  completedTasks={completedTasks}
+  taskRecords={taskRecords}
+  onTagClick={(tag) => setSelectedTag(tag)}
+  graphRefreshKey={graphRefreshKey} // ✅ 渡す
+/>
         );
       }
 
@@ -362,16 +364,17 @@ if (view === "calendar") {
 
         {renderView()}
 
-        <MenuBar
-          view={view}
-          setView={(v) => {
-            setView(v);
-            if (v === "graph") {
-              setSelectedTag(null);
-            }
-          }}
-          setSubView={setSubView}
-        />
+<MenuBar
+  view={view}
+  setView={(v) => {
+    setView(v);
+    if (v === "graph") {
+      setSelectedTag(null);
+      setGraphRefreshKey(prev => prev + 1); // ✅ グラフ再描画トリガー
+    }
+  }}
+  setSubView={setSubView}
+/>
       </div>
     </LocalizationProvider>
   );
