@@ -106,23 +106,32 @@ function App() {
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isComposing && newTask.trim() !== "") {
-      const text = newTask.trim();
-      const defaultTags = searchTagFilter.trim()
-        ? searchTagFilter.trim().split(/[,　\s]+/).filter(Boolean)
-        : [];
-      setTasks([...tasks, {
-        id: Date.now(),
-        title: text,
-        completed: false,
-        tags: defaultTags,
-        dueDate: null
-      }]);
-      setNewTask("");
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  };
+const handleKeyDown = (e) => {
+  if (e.key === "Enter" && !isComposing && newTask.trim() !== "") {
+    const text = newTask.trim();
+
+    // 🔹キーワードとタグフィルター両方を分割してタグ候補に
+    const keywordTags = searchKeyword.trim().split(/[,　\s]+/).filter(Boolean);
+    const tagFilterTags = searchTagFilter.trim().split(/[,　\s]+/).filter(Boolean);
+
+    const combinedTags = Array.from(new Set([...keywordTags, ...tagFilterTags]));
+
+    const dueDate = dateTo || null;
+
+    setTasks([...tasks, {
+      id: Date.now(),
+      title: text,
+      completed: false,
+      tags: combinedTags,
+      dueDate,
+    }]);
+
+    setNewTask("");
+
+    // 再度入力フォーカス
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }
+};
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;

@@ -1,11 +1,10 @@
+// SearchBar.js（仕様変更済み）
 import React from "react";
 import HybridDateInput from "./HybridDateInput";
 
 function SearchBar({
   keyword,
   setKeyword,
-  tagFilter,
-  setTagFilter,
   dateFrom,
   setDateFrom,
   dateTo,
@@ -13,7 +12,7 @@ function SearchBar({
 }) {
   return (
     <div style={{ padding: "0.5rem 0" }}>
-      {/* キーワード入力 */}
+      {/* キーワード入力（タグと統合） */}
       <div
         style={{
           display: "flex",
@@ -29,28 +28,7 @@ function SearchBar({
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           className="seamless-input"
-          placeholder="例:キーワード　小説　執筆"
-          style={{ flex: 1, height: "2rem" }}
-        />
-      </div>
-
-      {/* タグ入力 */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          maxWidth: "600px",
-          width: "100%",
-          gap: "0.5rem",
-          marginBottom: "0.5rem",
-        }}
-      >
-        <input
-          type="text"
-          value={tagFilter}
-          onChange={(e) => setTagFilter(e.target.value)}
-          className="seamless-input"
-          placeholder="例:タグ　小説　執筆"
+          placeholder="Keywords Tags"
           style={{ flex: 1, height: "2rem" }}
         />
       </div>
