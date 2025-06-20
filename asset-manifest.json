@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Tamurisu/static/css/main.a28a3502.css",
-    "main.js": "/Tamurisu/static/js/main.91b95fd2.js",
+    "main.js": "/Tamurisu/static/js/main.f2cc8b10.js",
     "static/js/453.24ea9431.chunk.js": "/Tamurisu/static/js/453.24ea9431.chunk.js",
     "index.html": "/Tamurisu/index.html",
     "main.a28a3502.css.map": "/Tamurisu/static/css/main.a28a3502.css.map",
-    "main.91b95fd2.js.map": "/Tamurisu/static/js/main.91b95fd2.js.map",
+    "main.f2cc8b10.js.map": "/Tamurisu/static/js/main.f2cc8b10.js.map",
     "453.24ea9431.chunk.js.map": "/Tamurisu/static/js/453.24ea9431.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a28a3502.css",
-    "static/js/main.91b95fd2.js"
+    "static/js/main.f2cc8b10.js"
   ]
 }
