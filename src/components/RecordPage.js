@@ -82,15 +82,23 @@ const handleStop = () => {
         {formatTime(elapsedTime)}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginBottom: "2rem" }}>
-        <button onClick={handleStart} disabled={isTiming || !selectedTaskId}>
-          開始
-        </button>
-        <button onClick={handleStop} disabled={!isTiming}>
-          終了
-        </button>
-      </div>
-
+<div style={{ marginBottom: "2rem" }}>
+  <button
+    onClick={isTiming ? handleStop : handleStart}
+    disabled={!selectedTaskId}
+    style={{
+      fontSize: "1.2rem",
+      padding: "0.75rem 2rem",
+      backgroundColor: "#71A4D9", // つゆくさ色で統一
+      color: "white",
+      border: "none",
+      borderRadius: "0.5rem",
+      cursor: "pointer",
+    }}
+  >
+    {isTiming ? "Stop" : "Start"}
+  </button>
+</div>
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         {Object.entries(taskRecords).map(([taskId, times]) => {

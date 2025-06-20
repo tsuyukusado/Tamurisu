@@ -1,9 +1,15 @@
 import React from "react";
-// これがないとCSSは適用されない！
 import "./CompletedTasks.css";
 import { AnimatePresence, motion } from "framer-motion";
 
-function CompletedTasks({ completedTasks, restoreTask, deleteTask, setSubView }) {  return (
+function CompletedTasks({
+  completedTasks,
+  restoreTask,
+  deleteTask,
+  setSubView,
+  onTaskClick // ← 追加！
+}) {
+  return (
     <div className="completed-view">
       <ul className="task-list">
         <AnimatePresence>
@@ -16,7 +22,12 @@ function CompletedTasks({ completedTasks, restoreTask, deleteTask, setSubView })
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <input className="task-edit" value={task.title} readOnly />
+              <input
+                className="task-edit"
+                value={task.title}
+                readOnly
+                onClick={() => onTaskClick(task.id)} // ← ここ追加！
+              />
               <div className="button-group">
                 <button
                   className="restore-button"
@@ -25,11 +36,11 @@ function CompletedTasks({ completedTasks, restoreTask, deleteTask, setSubView })
                   Restore
                 </button>
                 <button
-  className="delete-button"
-  onClick={() => deleteTask(task.id)}
->
-  Delete
-</button>
+                  className="delete-button"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  Delete
+                </button>
               </div>
             </motion.li>
           ))}

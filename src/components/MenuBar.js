@@ -27,11 +27,7 @@ function MenuBar({ setView, setSubView, view }) {
         style={iconStyle("others")}
         onClick={() => { setView("others"); setSubView(null); }}
       />
-      <FaCalendarDay
-        size={24}
-        style={iconStyle("today")}
-        onClick={() => setView("today")}
-      />
+      
       <FaTasks
         size={24}
         style={iconStyle("tasks")}

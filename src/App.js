@@ -34,6 +34,13 @@ function App() {
   const [subView, setSubView] = useState(null);
   const [removingId, setRemovingId] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const handleTaskClick = (id) => {
+    const task = tasks.find((t) => t.id === id) || completedTasks.find((t) => t.id === id);
+    if (task) {
+      setSelectedTask(task);
+      setView("detail");
+    }
+  };
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchTagFilter, setSearchTagFilter] = useState("");
@@ -195,104 +202,111 @@ function App() {
     return matchesKeyword && matchesTag && matchesDate;
   });
 
-const renderView = () => {
-  const inner = (() => {
-    if (view === "detail" && selectedTask) {
-      return (
-        <TaskDetail
-          task={selectedTask}
-          onClose={() => setView("tasks")}
-          onUpdate={updateTask}
-          onUpdateTags={(id, newTags) => {
-            const updatedTask = tasks.find(t => t.id === id);
-            if (!updatedTask) return;
-            updateTask({ ...updatedTask, tags: newTags });
-          }}
-        />
-      );
-    }
-
-    if (view === "record") {
-      return (
-        <RecordPage
-          tasks={tasks}
-          taskRecords={taskRecords}
-          setTaskRecords={setTaskRecords}
-        />
-      );
-    }
-
-    if (view === "graph") {
-      return selectedTag ? (
-        <DetailGraph
-          tag={selectedTag}
-          tasks={tasks}
-          completedTasks={completedTasks}
-          taskRecords={taskRecords}
-        />
-      ) : (
-        <TagGraphView
-          tasks={tasks}
-          completedTasks={completedTasks}
-          taskRecords={taskRecords}
-          onTagClick={(tag) => setSelectedTag(tag)}
-        />
-      );
-    }
-
-    if (view === "others") {
-      if (subView === "completed") {
+  const renderView = () => {
+    const inner = (() => {
+      if (view === "detail" && selectedTask) {
         return (
-          <CompletedTasks
-            completedTasks={completedTasks}
-            restoreTask={restoreTask}
-            deleteTask={deleteTask}
-            setSubView={setSubView}
+          <TaskDetail
+            task={selectedTask}
+            onClose={() => setView("tasks")}
+            onUpdate={updateTask}
+            onUpdateTags={(id, newTags) => {
+              const updatedTask = tasks.find(t => t.id === id);
+              if (!updatedTask) return;
+              updateTask({ ...updatedTask, tags: newTags });
+            }}
           />
         );
-      } else {
-        return <OthersView setSubView={setSubView} />;
       }
-    }
 
-    if (view === "tasks") {
-      return (
-        <>
-          {showSearchBar && (
-            <SearchBar
-              keyword={searchKeyword}
-              setKeyword={setSearchKeyword}
-              tagFilter={searchTagFilter}
-              setTagFilter={setSearchTagFilter}
-              dateFrom={dateFrom}
-              setDateFrom={setDateFrom}
-              dateTo={dateTo}
-              setDateTo={setDateTo}
-            />
-          )}
-          <TaskList
-            tasks={filteredTasks}
-            removingId={removingId}
-            setSelectedTask={setSelectedTask}
-            setView={setView}
-            toggleTask={toggleTask}
-            deleteTask={deleteTask}
-            newTask={newTask}
-            setNewTask={setNewTask}
-            handleKeyDown={handleKeyDown}
-            inputRef={inputRef}
-            setIsComposing={setIsComposing}
-            handleDragEnd={handleDragEnd}
+      if (view === "record") {
+        return (
+          <RecordPage
+            tasks={tasks}
+            taskRecords={taskRecords}
+            setTaskRecords={setTaskRecords}
           />
-        </>
-      );
-    }
+        );
+      }
 
-    return <div style={{ padding: "1rem" }}>🚧 機能準備中 ({view})</div>;
-  })();
+      if (view === "graph") {
+        return selectedTag ? (
+          <DetailGraph
+            tag={selectedTag}
+            tasks={tasks}
+            completedTasks={completedTasks}
+            taskRecords={taskRecords}
+          />
+        ) : (
+          <TagGraphView
+            tasks={tasks}
+            completedTasks={completedTasks}
+            taskRecords={taskRecords}
+            onTagClick={(tag) => setSelectedTag(tag)}
+          />
+        );
+      }
 
-  if (view === "calendar") {
-    return (
+      if (view === "others") {
+        if (subView === "completed") {
+          return (
+            <CompletedTasks
+              completedTasks={completedTasks}
+              restoreTask={restoreTask}
+              deleteTask={deleteTask}
+              setSubView={setSubView}
+              onTaskClick={handleTaskClick}
+            />
+          );
+        } else {
+          return <OthersView setSubView={setSubView} />;
+        }
+      }
+
+      if (view === "tasks") {
+        return (
+          <>
+            {showSearchBar && (
+              <SearchBar
+                keyword={searchKeyword}
+                setKeyword={setSearchKeyword}
+                tagFilter={searchTagFilter}
+                setTagFilter={setSearchTagFilter}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+                dateTo={dateTo}
+                setDateTo={setDateTo}
+              />
+            )}
+            <TaskList
+              tasks={filteredTasks}
+              removingId={removingId}
+              setSelectedTask={setSelectedTask}
+              setView={setView}
+              toggleTask={toggleTask}
+              deleteTask={deleteTask}
+              newTask={newTask}
+              setNewTask={setNewTask}
+              handleKeyDown={handleKeyDown}
+              inputRef={inputRef}
+              setIsComposing={setIsComposing}
+              handleDragEnd={handleDragEnd}
+            />
+          </>
+        );
+      }
+
+      return <div style={{ padding: "1rem" }}>🚧 機能準備中 ({view})</div>;
+    })();
+
+if (view === "calendar") {
+  return (
+    <>
+      <Container>
+        <div className="header-bar">
+          <h1>{viewTitles[view]}</h1>
+        </div>
+      </Container>
       <CalendarView
         tasks={[...tasks, ...completedTasks]}
         onDateSelect={(dateStr) => {
@@ -301,54 +315,63 @@ const renderView = () => {
           setDateTo(dateStr);
           setShowSearchBar(true);
         }}
+        onTaskClick={(taskId) => {
+          const target = [...tasks, ...completedTasks].find(t => t.id === taskId);
+          if (target) {
+            setSelectedTask(target);
+            setView("detail");
+          }
+        }}
       />
-    );
-  }
+    </>
+  );
+}
+    return <Container>{inner}</Container>;
+  };
 
-  return <Container>{inner}</Container>;
-};
-return (
-  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
-<div className="app">
-  {/* 👇 タイトルバーだけ Container で中央揃え */}
-  {view !== "calendar" ? (
-    <Container>
-      <div className="header-bar">
-        <h1>{viewTitles[view]}</h1>
-        {view === "tasks" && (
-          <FaSearch
-            size={20}
-            style={{ cursor: "pointer" }}
-            onClick={() => {
-              const newValue = !showSearchBar;
-              setShowSearchBar(newValue);
-              if (!newValue) {
-                setSearchKeyword("");
-                setSearchTagFilter("");
-              }
-            }}
-          />
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
+      <div className="app">
+        {view !== "calendar" && (
+          <Container>
+  <div
+    className="header-bar"
+    style={view === "calendar" ? { paddingTop: "20px" } : {}}
+  >
+    <h1>{viewTitles[view]}</h1>
+    {view === "tasks" && (
+      <FaSearch
+        size={20}
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          const newValue = !showSearchBar;
+          setShowSearchBar(newValue);
+          if (!newValue) {
+            setSearchKeyword("");
+            setSearchTagFilter("");
+          }
+        }}
+      />
+    )}
+  </div>
+</Container>
         )}
-      </div>
-    </Container>
-  ) : (
-    <div className="header-bar" style={{ padding: "20px 20px 0", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>{viewTitles[view]}</h1>
-    </div>
-  )}
 
-  {renderView()}
-  <MenuBar
-    view={view}
-    setView={(v) => {
-      setView(v);
-      if (v === "graph") {
-        setSelectedTag(null);
-      }
-    }}
-    setSubView={setSubView}
-  />
-</div>  </LocalizationProvider>
-);}
+        {renderView()}
+
+        <MenuBar
+          view={view}
+          setView={(v) => {
+            setView(v);
+            if (v === "graph") {
+              setSelectedTag(null);
+            }
+          }}
+          setSubView={setSubView}
+        />
+      </div>
+    </LocalizationProvider>
+  );
+}
 
 export default App;
