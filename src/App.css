@@ -1,3 +1,8 @@
+/* 一番上に追加するとベスト */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* === ベース設定 === */
 body, html, #root {
   margin: 0;
@@ -133,30 +138,51 @@ h1 {
   font-size: 1.1rem;
 }
 
-/* App.css に以下を追加（全体に影響） */
-body, html, #root {
+/* === グローバルリセット === */
+html, body, #root {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
   width: 100vw;
+}
+
+/* === アプリ全体 === */
+.app {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 10px 10px 10px;
+}
+.fc {
+  width: 100%;               /* ← ここ！100vwをやめる */
+  max-width: none;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.fc-view-harness {
+  overflow-x: auto;         /* スクロール防止 */
+}
+/* === カレンダー用の個別ラッパー（任意） === */
+.calendar-wrapper {
+  width: 100%;
   overflow-x: hidden;
 }
 
-.app {
+/* === タイトルやヘッダーなどを中央寄せするなら別で指定 === */
+.centered-header {
   max-width: 600px;
   margin: 0 auto;
-  padding: 80px 20px 60px;
+  padding: 20px 16px 0;
+  text-align: center;
 }
 
-.calendar-wrapper {
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-}
-
-/* FullCalendar のツールバーを中央600px幅に制限 */
-.fc-header-toolbar {
-  max-width: 600px;
-  margin: 0 auto;
+/* タイトルと検索アイコンを横並びに */
+.header-bar {
   display: flex;
   justify-content: space-between;
-  padding: 0 10px; /* 任意で余白追加 */
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 20px 0;
 }

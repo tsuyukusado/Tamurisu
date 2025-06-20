@@ -18,6 +18,7 @@ import "dayjs/locale/ja";
 import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
 import updateLocale from "dayjs/plugin/updateLocale";
+import Container from "./components/Container"; // 上部に追加
 
 dayjs.extend(updateLocale);
 dayjs.extend(weekday);
@@ -194,7 +195,8 @@ function App() {
     return matchesKeyword && matchesTag && matchesDate;
   });
 
-  const renderView = () => {
+const renderView = () => {
+  const inner = (() => {
     if (view === "detail" && selectedTask) {
       return (
         <TaskDetail
@@ -235,19 +237,6 @@ function App() {
           taskRecords={taskRecords}
           onTagClick={(tag) => setSelectedTag(tag)}
         />
-      );
-    }
-
-    if (view === "calendar") {
-      return (
-<CalendarView
-  onDateSelect={(dateStr) => {
-    setView("tasks");
-    setDateFrom(dateStr);
-    setDateTo(dateStr);
-    setShowSearchBar(true);
-  }}
-/>
       );
     }
 
@@ -300,45 +289,66 @@ function App() {
     }
 
     return <div style={{ padding: "1rem" }}>🚧 機能準備中 ({view})</div>;
-  };
+  })();
 
+  if (view === "calendar") {
+    return (
+      <CalendarView
+        tasks={[...tasks, ...completedTasks]}
+        onDateSelect={(dateStr) => {
+          setView("tasks");
+          setDateFrom(dateStr);
+          setDateTo(dateStr);
+          setShowSearchBar(true);
+        }}
+      />
+    );
+  }
+
+  return <Container>{inner}</Container>;
+};
 return (
   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
-    <div className="app">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+<div className="app">
+  {/* 👇 タイトルバーだけ Container で中央揃え */}
+  {view !== "calendar" ? (
+    <Container>
+      <div className="header-bar">
         <h1>{viewTitles[view]}</h1>
-        <FaSearch
-          size={20}
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            if (view === "tasks") {
+        {view === "tasks" && (
+          <FaSearch
+            size={20}
+            style={{ cursor: "pointer" }}
+            onClick={() => {
               const newValue = !showSearchBar;
               setShowSearchBar(newValue);
               if (!newValue) {
                 setSearchKeyword("");
                 setSearchTagFilter("");
               }
-            } else {
-              setView("tasks");
-            }
-          }}
-        />
+            }}
+          />
+        )}
       </div>
-
-      {renderView()}
-
-      <MenuBar
-        view={view}
-        setView={(v) => {
-          setView(v);
-          if (v === "graph") {
-            setSelectedTag(null);
-          }
-        }}
-        setSubView={setSubView}
-      />
+    </Container>
+  ) : (
+    <div className="header-bar" style={{ padding: "20px 20px 0", maxWidth: "600px", margin: "0 auto" }}>
+      <h1>{viewTitles[view]}</h1>
     </div>
-  </LocalizationProvider>
+  )}
+
+  {renderView()}
+  <MenuBar
+    view={view}
+    setView={(v) => {
+      setView(v);
+      if (v === "graph") {
+        setSelectedTag(null);
+      }
+    }}
+    setSubView={setSubView}
+  />
+</div>  </LocalizationProvider>
 );}
 
 export default App;
