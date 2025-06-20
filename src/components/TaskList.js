@@ -70,7 +70,7 @@ function TaskList({
 <input
   ref={inputRef}
   className="task-input new-task-input"
-  placeholder={showSearchBar ? "Add task with tags..." : "Add task..."}
+  placeholder={showSearchBar ? "Add a task (include tags and date)..." : "Add a task..."}
   value={newTask}
   onChange={(e) => setNewTask(e.target.value)}
   onKeyDown={handleKeyDown}

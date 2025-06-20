@@ -5,3 +5,22 @@
   border: none;
   cursor: pointer;
 }
+
+/* TaskList.css に追記 or 修正 */
+.new-task-input {
+  width: 100%;
+  max-width: 600px;       /* ✅ フル拡大の上限を600pxに */
+  margin: 0 auto;         /* ✅ 中央寄せにしたい場合 */
+  display: block;         /* ✅ 中央寄せのために必要 */
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.new-task-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: none !important;
+}
