@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/tamuris/static/css/main.a28a3502.css",
+    "main.js": "/tamuris/static/js/main.ad6d2143.js",
+    "static/js/453.24ea9431.chunk.js": "/tamuris/static/js/453.24ea9431.chunk.js",
+    "index.html": "/tamuris/index.html",
+    "main.a28a3502.css.map": "/tamuris/static/css/main.a28a3502.css.map",
+    "main.ad6d2143.js.map": "/tamuris/static/js/main.ad6d2143.js.map",
+    "453.24ea9431.chunk.js.map": "/tamuris/static/js/453.24ea9431.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a28a3502.css",
+    "static/js/main.ad6d2143.js"
+  ]
+}
