@@ -1,0 +1,7 @@
+/* CalendarView.css または App.css に追記 */
+.fc-event {
+  background-color: #71A4D9 !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold;
+}

@@ -1,0 +1,7 @@
+/* App.css または MenuBar.css に追記 */
+.menu-bar .menu-item.active {
+  color: #71A4D9;
+}
+.menu-bar .menu-item:hover {
+  color: #71A4D9;
+}

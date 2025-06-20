@@ -16,7 +16,7 @@ function MenuBar({ setView, setSubView, view }) {
   };
 
   const iconStyle = (targetView) => ({
-    color: isActive(targetView) ? "#007bff" : "#666",
+    color: isActive(targetView) ? "#71A4D9" : "#666",
     cursor: "pointer"
   });
 
@@ -27,7 +27,7 @@ function MenuBar({ setView, setSubView, view }) {
         style={iconStyle("others")}
         onClick={() => { setView("others"); setSubView(null); }}
       />
-      
+
       <FaTasks
         size={24}
         style={iconStyle("tasks")}

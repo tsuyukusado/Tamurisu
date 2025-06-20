@@ -19,6 +19,7 @@ import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
 import updateLocale from "dayjs/plugin/updateLocale";
 import Container from "./components/Container"; // 上部に追加
+import InfoPage from "./components/InfoPage";
 
 dayjs.extend(updateLocale);
 dayjs.extend(weekday);
@@ -169,12 +170,12 @@ function App() {
   };
 
   const viewTitles = {
-    others: subView === "completed" ? "完了済みタスク" : "その他",
+    others: "Others",
     today: "Today",
     tasks: "Tasks",
-    record: "記録",
-    calendar: "カレンダー",
-    graph: "グラフ",
+    record: "Timer",
+    calendar: "Calendar",
+    graph: "Graph",
     detail: "Tasks"
   };
 
@@ -247,21 +248,23 @@ function App() {
         );
       }
 
-      if (view === "others") {
-        if (subView === "completed") {
-          return (
-            <CompletedTasks
-              completedTasks={completedTasks}
-              restoreTask={restoreTask}
-              deleteTask={deleteTask}
-              setSubView={setSubView}
-              onTaskClick={handleTaskClick}
-            />
-          );
-        } else {
-          return <OthersView setSubView={setSubView} />;
-        }
-      }
+if (view === "others") {
+  if (subView === "completed") {
+    return (
+      <CompletedTasks
+        completedTasks={completedTasks}
+        restoreTask={restoreTask}
+        deleteTask={deleteTask}
+        setSubView={setSubView}
+        onTaskClick={handleTaskClick}
+      />
+    );
+  } else if (subView === "info") {
+    return <InfoPage setSubView={setSubView} />;
+  } else {
+    return <OthersView setSubView={setSubView} />;
+  }
+}
 
       if (view === "tasks") {
         return (
