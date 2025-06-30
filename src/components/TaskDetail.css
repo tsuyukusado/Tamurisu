@@ -111,3 +111,14 @@
   background: transparent;
   margin-top: 0.5rem;
 }
+
+/* Chrome, Safari */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Firefox */
+input[type="datetime-local"] {
+  appearance: none;
+}

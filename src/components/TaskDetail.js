@@ -13,10 +13,14 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {
   const [editedTime, setEditedTime] = useState(""); // "HH:MM:SS" 形式
   const [dueDate, setDueDate] = useState(task.dueDate || ""); // 日付形式
 
-  useEffect(() => {
-    setEditedTitle(task.title);
+useEffect(() => {
+  setEditedTitle(task.title);
+  setDueDate(task.dueDate || "");
+
+  // タグが本当に変わった時だけ更新
+  if (JSON.stringify(task.tags) !== JSON.stringify(tags)) {
     setTags(task.tags || []);
-    setDueDate(task.dueDate || "");
+  }
 
     const records = JSON.parse(localStorage.getItem("taskRecords")) || {};
 const durations = records[task.id] || [];

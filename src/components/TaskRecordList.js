@@ -1,6 +1,11 @@
-// components/TaskRecordList.jsx
-import React, { useState } from "react";
-import { format } from "date-fns";
+import React, { useState, useEffect, useRef } from "react";
+import { FaTrash, FaCalendarAlt } from "react-icons/fa";
+import HybridDateTimeInput from "./HybridDateTimeInput";
+import { AnimatePresence } from "framer-motion";
+import AnimatedItem from "./AnimatedItem";
+
+
+
 
 function formatDuration(seconds) {
     const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -15,94 +20,142 @@ function parseDuration(str) {
     return parts[0] * 3600 + parts[1] * 60 + parts[2];
 }
 
-function formatLocalDatetime(timestamp) {
-  const date = new Date(timestamp);
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  const hh = String(date.getHours()).padStart(2, "0");
-  const min = String(date.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+function formatLocalDatetimeInputValue(timestamp) {
+    const date = new Date(timestamp);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 }
 
 function TaskRecordList({ taskId, onChange }) {
-const [records, setRecords] = useState(() => {
-  const stored = JSON.parse(localStorage.getItem("taskRecords")) || {};
-  const list = stored[taskId] || [];
-  return list.map((r, index) => {
-    if (typeof r === "number") {
-      return {
-        id: index,
-        timestamp: Date.now() + index, // ✅ 1ミリ秒ずつずらす
-        duration: r,
-      };
-    }
+    const [records, setRecords] = useState([]);
+
+    // 👇 useRefを配列で管理
+    const dateRefs = useRef([]);
+
+    useEffect(() => {
+        const stored = JSON.parse(localStorage.getItem("taskRecords")) || {};
+        const list = stored[taskId] || [];
+
+        let updated = false;
+const normalized = list.map((r, index) => {
+  if (typeof r === "number") {
+    updated = true;
     return {
-      id: index,
-      timestamp: typeof r.timestamp === "number" ? r.timestamp : Date.now() + index,
-      duration: typeof r.duration === "number" ? r.duration : 0,
+      id: crypto.randomUUID(), // ✅ 永続IDを生成（Node.js 18以降 or polyfill）
+      timestamp: Date.now(),
+      duration: r,
     };
-  });
+  }
+  return {
+    id: r.id ?? crypto.randomUUID(), // ✅ 既にあれば使う
+    timestamp: typeof r.timestamp === "number" ? r.timestamp : Date.now(),
+    duration: typeof r.duration === "number" ? r.duration : 0,
+  };
 });
+        // ⏺️ 上書き保存（初回だけ）
+        if (updated) {
+            stored[taskId] = normalized;
+            localStorage.setItem("taskRecords", JSON.stringify(stored));
+        }
+
+        // 💾 IDを付けて setRecords に渡す
+        setRecords(normalized); // ← id はもう中にあるので再生成しない！
+    }, [taskId]);
+
+const saveRecords = (newRecords) => {
+const cleaned = newRecords.map(({ id, timestamp, duration }) => ({ id, timestamp, duration }));  const all = JSON.parse(localStorage.getItem("taskRecords")) || {};
+  all[taskId] = cleaned;
+  localStorage.setItem("taskRecords", JSON.stringify(all));
+
+  // 🔍 前と同じなら setRecords しない
+const prev = JSON.stringify(records.map(r => ({ id: r.id, timestamp: r.timestamp, duration: r.duration })));
+const next = JSON.stringify(cleaned);
+
+// 👇 ここで必ずログを出す！
+console.log("prev:", prev);
+console.log("next:", next);
+console.log("equal?", prev === next);
+
+if (prev !== next) {
+    setRecords(newRecords);
+  }
+
+  if (onChange) onChange(all);
+
+};
 
     const handleEdit = (index, field, value) => {
-        setRecords((prev) => {
-            const copy = [...prev];
-            if (field === "duration") {
-                const seconds = parseDuration(value);
-                if (seconds !== null) {
-                    copy[index][field] = seconds;
-                }
-            } else if (field === "timestamp") {
-                copy[index][field] = new Date(value).getTime();
-            }
-            return copy;
-        });
+
+       console.log("📝 handleEdit called:", index, field, value); 
+
+        const updated = [...records];
+        if (field === "duration") {
+            const sec = parseDuration(value);
+            if (sec !== null) updated[index].duration = sec;
+        } else if (field === "timestamp") {
+            updated[index].timestamp = new Date(value).getTime();
+        }
+        saveRecords(updated);
     };
 
-    const handleSave = () => {
-        const cleaned = records.map(({ timestamp, duration }) => ({ timestamp, duration }));
-        const all = JSON.parse(localStorage.getItem("taskRecords")) || {};
-        all[taskId] = cleaned;
-        localStorage.setItem("taskRecords", JSON.stringify(all));
-        if (onChange) onChange(all); // 親に通知
+    const handleDelete = (index) => {
+        const updated = [...records];
+        updated.splice(index, 1);
+        saveRecords(updated);
     };
 
     return (
         <div style={{ marginTop: "1rem" }}>
-            <h3>記録一覧</h3>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                    <tr>
-                        <th style={{ textAlign: "left" }}>日時</th>
-                        <th style={{ textAlign: "left" }}>時間（HH:MM:SS）</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    {records.map((rec, idx) => (
-                        <tr key={idx}>
-                            <td>
-<input
-  type="datetime-local"
-  value={formatLocalDatetime(rec.timestamp)}
-  onChange={(e) => handleEdit(idx, "timestamp", e.target.value)}
-/>                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={formatDuration(rec.duration)}
-                                    onChange={(e) => handleEdit(idx, "duration", e.target.value)}
-                                />
-                            </td>
-                        </tr>
-                    ))}
+<AnimatePresence>
+  {records.map((rec, idx) => {
+    console.log("Rendering record:", rec.id);
+    return (
+      <AnimatedItem key={rec.id} tag="tr">
+        <td style={{ minWidth: "220px" }}>
+          <HybridDateTimeInput
+            value={rec.timestamp}
+onChange={(val) => {
+  console.log("📅 timestamp changed:", val);
+  handleEdit(idx, "timestamp", val);
+}}
+          />
+        </td>
+        <td>
+          <input
+            type="text"
+            className="seamless-input"
+            value={formatDuration(rec.duration)}
+            onChange={(e) => handleEdit(idx, "duration", e.target.value)}
+          />
+        </td>
+        <td>
+          <button
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "#D9534F",
+              fontSize: "0.9rem",
+            }}
+            onClick={() => handleDelete(idx)}
+          >
+            Delete
+          </button>
+        </td>
+      </AnimatedItem>
+    );
+  })}
+</AnimatePresence>
                 </tbody>
             </table>
-            <button style={{ marginTop: "0.5rem" }} onClick={handleSave}>
-                保存
-            </button>
         </div>
     );
 }
 
-export default TaskRecordList;
+export default React.memo(TaskRecordList);
