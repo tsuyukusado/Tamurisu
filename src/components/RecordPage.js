@@ -30,8 +30,10 @@ function RecordPage({ tasks, taskRecords, setTaskRecords }) {
     const duration = Math.floor((Date.now() - startTime) / 1000);
     const updatedRecords = { ...taskRecords };
     if (!updatedRecords[selectedTaskId]) updatedRecords[selectedTaskId] = [];
-    updatedRecords[selectedTaskId].push(duration);
-    setTaskRecords(updatedRecords);
+updatedRecords[selectedTaskId].push({
+  duration,
+  date: new Date().toISOString(), // ISO形式で日時を保存
+});    setTaskRecords(updatedRecords);
     setIsTiming(false);
   };
 

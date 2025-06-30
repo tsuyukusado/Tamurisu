@@ -18,9 +18,11 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {
     setDueDate(task.dueDate || "");
 
     const records = JSON.parse(localStorage.getItem("taskRecords")) || {};
-    const durations = records[task.id] || [];
-    const total = durations.reduce((acc, sec) => acc + sec, 0);
-    setRecordTime(total);
+const durations = records[task.id] || [];
+const total = durations.reduce((acc, rec) => {
+  if (typeof rec === "number") return acc + rec; // 旧形式に一応対応
+  return acc + (rec.duration || 0);              // 新形式
+}, 0);    setRecordTime(total);
     setEditedTime(formatTime(total));
   }, [task]);
 

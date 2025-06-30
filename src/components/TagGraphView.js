@@ -28,8 +28,10 @@ function TagGraphView({ tasks, completedTasks, taskRecords, onTagClick, graphRef
     allTasks.forEach((task) => {
       const records = taskRecords[task.id.toString()];
       if (!records || !task.tags) return;
-      const sum = records.reduce((a, b) => a + b, 0);
-      task.tags.forEach((tag) => {
+const sum = records.reduce((a, rec) => {
+  if (typeof rec === "number") return a + rec; // ← 旧形式にも対応
+  return a + (rec.duration || 0);              // ← 新形式
+}, 0);      task.tags.forEach((tag) => {
         if (!totals[tag]) totals[tag] = 0;
         totals[tag] += sum;
       });

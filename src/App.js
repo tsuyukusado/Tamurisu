@@ -20,6 +20,8 @@ import localeData from "dayjs/plugin/localeData";
 import updateLocale from "dayjs/plugin/updateLocale";
 import Container from "./components/Container"; // 上部に追加
 import InfoPage from "./components/InfoPage";
+import TimeRangeGraphView from "./components/TimeRangeGraphView";
+import UnifiedTagGraphView from "./components/UnifiedTagGraphView";
 
 dayjs.extend(updateLocale);
 dayjs.extend(weekday);
@@ -58,15 +60,40 @@ function App() {
   const [selectedTag, setSelectedTag] = useState(null);
   const [graphRefreshKey, setGraphRefreshKey] = useState(0); // 🔄 グラフ再描画用
 
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    const storedCompleted = JSON.parse(localStorage.getItem("completedTasks")) || [];
-    const storedRecords = JSON.parse(localStorage.getItem("taskRecords")) || {};
-    setTasks(storedTasks);
-    setCompletedTasks(storedCompleted);
-    setTaskRecords(storedRecords);
-    setIsInitialized(true);
-  }, []);
+useEffect(() => {
+  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  const storedCompleted = JSON.parse(localStorage.getItem("completedTasks")) || [];
+  const rawRecords = JSON.parse(localStorage.getItem("taskRecords")) || {};
+
+  // 🔁 旧形式からの変換処理
+  const convertedRecords = {};
+  let needsUpdate = false;
+
+  for (const [taskId, records] of Object.entries(rawRecords)) {
+    convertedRecords[taskId] = records.map((record) => {
+      if (typeof record === "number") {
+        needsUpdate = true;
+        return {
+          duration: record,
+          date: new Date().toISOString(), // 旧データは現在時刻で補完
+        };
+      }
+      return record;
+    });
+  }
+
+  if (needsUpdate) {
+    localStorage.setItem("taskRecords", JSON.stringify(convertedRecords));
+    console.log("✅ 旧形式 taskRecords を新形式に変換・保存しました");
+  }
+
+  setTasks(storedTasks);
+  setCompletedTasks(storedCompleted);
+  setTaskRecords(convertedRecords);
+  setIsInitialized(true);
+}, []);
+
+
 
   useEffect(() => {
     if (isInitialized) {
@@ -251,13 +278,13 @@ const handleKeyDown = (e) => {
             onBack={() => setSelectedTag(null)} // ← 状態管理側で
           />
         ) : (
-<TagGraphView
-  tasks={tasks}
-  completedTasks={completedTasks}
-  taskRecords={taskRecords}
-  onTagClick={(tag) => setSelectedTag(tag)}
-  graphRefreshKey={graphRefreshKey} // ✅ 渡す
-/>
+    <UnifiedTagGraphView
+      tasks={tasks}
+      completedTasks={completedTasks}
+      taskRecords={taskRecords}
+      onTagClick={(tag) => setSelectedTag(tag)}
+    />
+
         );
       }
 
