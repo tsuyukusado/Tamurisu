@@ -3,6 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import "./TaskDetail.css";
 import HybridDateInput from "./HybridDateInput";
 import BackButton from "./BackButton"; // ✅ 追加
+import TaskRecordList from "./TaskRecordList"; // ✅ 追加
 
 function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {  // ✅ 追加確認
   const [newTag, setNewTag] = useState("");
@@ -165,6 +166,10 @@ const handleTimeUpdate = () => {
       </div>
 
       <hr className="tag-divider" />
+
+{/* 記録一覧 */}
+<TaskRecordList taskId={task.id} onChange={setTaskRecords} />
+
 
       {/* ✅ 戻るボタンを右下に配置 */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
