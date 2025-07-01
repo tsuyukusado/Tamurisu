@@ -18,9 +18,8 @@ import "dayjs/locale/ja";
 import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
 import updateLocale from "dayjs/plugin/updateLocale";
-import Container from "./components/Container"; // 上部に追加
+import Container from "./components/Container";
 import InfoPage from "./components/InfoPage";
-import TimeRangeGraphView from "./components/TimeRangeGraphView";
 import UnifiedTagGraphView from "./components/UnifiedTagGraphView";
 
 dayjs.extend(updateLocale);
@@ -37,13 +36,6 @@ function App() {
   const [subView, setSubView] = useState(null);
   const [removingId, setRemovingId] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
-  const handleTaskClick = (id) => {
-    const task = tasks.find((t) => t.id === id) || completedTasks.find((t) => t.id === id);
-    if (task) {
-      setSelectedTask(task);
-      setView("detail");
-    }
-  };
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchTagFilter, setSearchTagFilter] = useState("");
@@ -52,48 +44,51 @@ function App() {
   const [keyword, setKeyword] = useState("");
   const [tagFilter, setTagFilter] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
-  const [taskRecords, setTaskRecords] = useState(() => {
-    return JSON.parse(localStorage.getItem("taskRecords")) || {};
-  });
+  const [taskRecords, setTaskRecords] = useState({});
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selectedTag, setSelectedTag] = useState(null);
-  const [graphRefreshKey, setGraphRefreshKey] = useState(0); // 🔄 グラフ再描画用
+  const [graphRefreshKey, setGraphRefreshKey] = useState(0);
 
-useEffect(() => {
-  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-  const storedCompleted = JSON.parse(localStorage.getItem("completedTasks")) || [];
-  const rawRecords = JSON.parse(localStorage.getItem("taskRecords")) || {};
+  useEffect(() => {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    const storedCompleted = JSON.parse(localStorage.getItem("completedTasks")) || [];
+    const rawRecords = JSON.parse(localStorage.getItem("taskRecords")) || {};
 
-  // 🔁 旧形式からの変換処理
-  const convertedRecords = {};
-  let needsUpdate = false;
+    const convertedRecords = {};
+    let needsUpdate = false;
 
-  for (const [taskId, records] of Object.entries(rawRecords)) {
-    convertedRecords[taskId] = records.map((record) => {
-      if (typeof record === "number") {
-        needsUpdate = true;
-        return {
-          duration: record,
-          date: new Date().toISOString(), // 旧データは現在時刻で補完
-        };
-      }
-      return record;
-    });
-  }
+    for (const [taskId, records] of Object.entries(rawRecords)) {
+      convertedRecords[taskId] = records.map((record) => {
+        if (typeof record === "number") {
+          needsUpdate = true;
+          return {
+            duration: record,
+            date: new Date().toISOString(),
+          };
+        }
+        return record;
+      });
+    }
 
-  if (needsUpdate) {
-    localStorage.setItem("taskRecords", JSON.stringify(convertedRecords));
-    console.log("✅ 旧形式 taskRecords を新形式に変換・保存しました");
-  }
+    // ✅ ここに追記！ 孤立レコードの掃除
+    const validTaskIds = [...storedTasks, ...storedCompleted].map(t => t.id.toString());
+    const cleanedRecords = Object.fromEntries(
+      Object.entries(convertedRecords).filter(([taskId]) =>
+        validTaskIds.includes(taskId)
+      )
+    );
 
-  setTasks(storedTasks);
-  setCompletedTasks(storedCompleted);
-  setTaskRecords(convertedRecords);
-  setIsInitialized(true);
-}, []);
+    if (needsUpdate) {
+      localStorage.setItem("taskRecords", JSON.stringify(cleanedRecords));
+      console.log("✅ 旧形式 taskRecords を新形式に変換・保存しました");
+    }
 
-
+    setTasks(storedTasks);
+    setCompletedTasks(storedCompleted);
+    setTaskRecords(cleanedRecords); // ← ここも cleanedRecords に変更！
+    setIsInitialized(true);
+  }, []);
 
   useEffect(() => {
     if (isInitialized) {
@@ -133,32 +128,29 @@ useEffect(() => {
     }
   };
 
-const handleKeyDown = (e) => {
-  if (e.key === "Enter" && !isComposing && newTask.trim() !== "") {
-    const text = newTask.trim();
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !isComposing && newTask.trim() !== "") {
+      const text = newTask.trim();
 
-    // 🔹キーワードとタグフィルター両方を分割してタグ候補に
-    const keywordTags = searchKeyword.trim().split(/[,　\s]+/).filter(Boolean);
-    const tagFilterTags = searchTagFilter.trim().split(/[,　\s]+/).filter(Boolean);
+      const keywordTags = searchKeyword.trim().split(/[,　\s]+/).filter(Boolean);
+      const tagFilterTags = searchTagFilter.trim().split(/[,　\s]+/).filter(Boolean);
 
-    const combinedTags = Array.from(new Set([...keywordTags, ...tagFilterTags]));
+      const combinedTags = Array.from(new Set([...keywordTags, ...tagFilterTags]));
 
-    const dueDate = dateTo || null;
+      const dueDate = dateTo || null;
 
-    setTasks([...tasks, {
-      id: Date.now(),
-      title: text,
-      completed: false,
-      tags: combinedTags,
-      dueDate,
-    }]);
+      setTasks([...tasks, {
+        id: Date.now(),
+        title: text,
+        completed: false,
+        tags: combinedTags,
+        dueDate,
+      }]);
 
-    setNewTask("");
-
-    // 再度入力フォーカス
-    setTimeout(() => inputRef.current?.focus(), 0);
-  }
-};
+      setNewTask("");
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  };
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -253,7 +245,7 @@ const handleKeyDown = (e) => {
               if (!updatedTask) return;
               updateTask({ ...updatedTask, tags: newTags });
             }}
-            setTaskRecords={setTaskRecords}  // ✅ 渡しているか？？
+            setTaskRecords={setTaskRecords}
           />
         );
       }
@@ -275,36 +267,35 @@ const handleKeyDown = (e) => {
             tasks={tasks}
             completedTasks={completedTasks}
             taskRecords={taskRecords}
-            onBack={() => setSelectedTag(null)} // ← 状態管理側で
+            onBack={() => setSelectedTag(null)}
           />
         ) : (
-    <UnifiedTagGraphView
-      tasks={tasks}
-      completedTasks={completedTasks}
-      taskRecords={taskRecords}
-      onTagClick={(tag) => setSelectedTag(tag)}
-    />
-
+          <UnifiedTagGraphView
+            tasks={tasks}
+            completedTasks={completedTasks}
+            taskRecords={taskRecords}
+            onTagClick={(tag) => setSelectedTag(tag)}
+          />
         );
       }
 
-if (view === "others") {
-  if (subView === "completed") {
-    return (
-      <CompletedTasks
-        completedTasks={completedTasks}
-        restoreTask={restoreTask}
-        deleteTask={deleteTask}
-        setSubView={setSubView}
-        onTaskClick={handleTaskClick}
-      />
-    );
-  } else if (subView === "info") {
-    return <InfoPage setSubView={setSubView} />;
-  } else {
-    return <OthersView setSubView={setSubView} />;
-  }
-}
+      if (view === "others") {
+        if (subView === "completed") {
+          return (
+            <CompletedTasks
+              completedTasks={completedTasks}
+              restoreTask={restoreTask}
+              deleteTask={deleteTask}
+              setSubView={setSubView}
+              onTaskClick={setSelectedTask}
+            />
+          );
+        } else if (subView === "info") {
+          return <InfoPage setSubView={setSubView} />;
+        } else {
+          return <OthersView setSubView={setSubView} />;
+        }
+      }
 
       if (view === "tasks") {
         return (
@@ -334,7 +325,7 @@ if (view === "others") {
               inputRef={inputRef}
               setIsComposing={setIsComposing}
               handleDragEnd={handleDragEnd}
-              showSearchBar={showSearchBar} // ← 追加
+              showSearchBar={showSearchBar}
             />
           </>
         );
@@ -343,33 +334,33 @@ if (view === "others") {
       return <div style={{ padding: "1rem" }}>🚧 機能準備中 ({view})</div>;
     })();
 
-if (view === "calendar") {
-  return (
-    <>
-      <Container>
-        <div className="header-bar">
-          <h1>{viewTitles[view]}</h1>
-        </div>
-      </Container>
-      <CalendarView
-        tasks={[...tasks, ...completedTasks]}
-        onDateSelect={(dateStr) => {
-          setView("tasks");
-          setDateFrom(dateStr);
-          setDateTo(dateStr);
-          setShowSearchBar(true);
-        }}
-        onTaskClick={(taskId) => {
-          const target = [...tasks, ...completedTasks].find(t => t.id === taskId);
-          if (target) {
-            setSelectedTask(target);
-            setView("detail");
-          }
-        }}
-      />
-    </>
-  );
-}
+    if (view === "calendar") {
+      return (
+        <>
+          <Container>
+            <div className="header-bar">
+              <h1>{viewTitles[view]}</h1>
+            </div>
+          </Container>
+          <CalendarView
+            tasks={[...tasks, ...completedTasks]}
+            onDateSelect={(dateStr) => {
+              setView("tasks");
+              setDateFrom(dateStr);
+              setDateTo(dateStr);
+              setShowSearchBar(true);
+            }}
+            onTaskClick={(taskId) => {
+              const target = [...tasks, ...completedTasks].find(t => t.id === taskId);
+              if (target) {
+                setSelectedTask(target);
+                setView("detail");
+              }
+            }}
+          />
+        </>
+      );
+    }
     return <Container>{inner}</Container>;
   };
 
@@ -378,42 +369,33 @@ if (view === "calendar") {
       <div className="app">
         {view !== "calendar" && (
           <Container>
-  <div
-    className="header-bar"
-    style={view === "calendar" ? { paddingTop: "20px" } : {}}
-  >
-    <h1>{viewTitles[view]}</h1>
-    {view === "tasks" && (
-      <FaSearch
-        size={20}
-        style={{ cursor: "pointer" }}
-        onClick={() => {
-          const newValue = !showSearchBar;
-          setShowSearchBar(newValue);
-          if (!newValue) {
-            setSearchKeyword("");
-            setSearchTagFilter("");
-          }
-        }}
-      />
-    )}
-  </div>
-</Container>
+            <div
+              className="header-bar"
+              style={view === "calendar" ? { paddingTop: "20px" } : {}}
+            >
+              <h1>{viewTitles[view]}</h1>
+              {view === "tasks" && (
+                <FaSearch
+                  size={20}
+                  style={{ cursor: "pointer" }}
+                  onClick={toggleSearch}
+                />
+              )}
+            </div>
+          </Container>
         )}
-
         {renderView()}
-
-<MenuBar
-  view={view}
-  setView={(v) => {
-    setView(v);
-    if (v === "graph") {
-      setSelectedTag(null);
-      setGraphRefreshKey(prev => prev + 1); // ✅ グラフ再描画トリガー
-    }
-  }}
-  setSubView={setSubView}
-/>
+        <MenuBar
+          view={view}
+          setView={(v) => {
+            setView(v);
+            if (v === "graph") {
+              setSelectedTag(null);
+              setGraphRefreshKey(prev => prev + 1);
+            }
+          }}
+          setSubView={setSubView}
+        />
       </div>
     </LocalizationProvider>
   );

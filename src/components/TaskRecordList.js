@@ -98,7 +98,7 @@ if (prev !== next) {
             const sec = parseDuration(value);
             if (sec !== null) updated[index].duration = sec;
         } else if (field === "timestamp") {
-            updated[index].timestamp = new Date(value).getTime();
+updated[index].timestamp = value; // ←これでいい！
         }
         saveRecords(updated);
     };
