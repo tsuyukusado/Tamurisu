@@ -17,11 +17,11 @@ function FlexibleDateTimeInput({ value, onChange }) {
     return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
   };
 
-  useEffect(() => {
-    if (value) {
-      setText(formatDisplay(value));
-    }
-  }, [value]);
+useEffect(() => {
+  if (value) {
+    setText(formatDisplay(value));
+  }
+}, [value]); // ← text は入れない！
 
   const handleChange = (e) => {
     setText(e.target.value);
