@@ -5,6 +5,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc"; // ← これ！
 import isoWeek from "dayjs/plugin/isoWeek";
+import { COLORS } from "../constants/colors";
+import GraphCenterLabel from "./GraphCenterLabel";
 dayjs.extend(isoWeek);
 
 dayjs.extend(utc); // ← 忘れずに！
@@ -140,26 +142,36 @@ const options = {
 return (
   <div style={{ textAlign: "center", paddingTop: "1rem" }}>
     <div style={{ marginBottom: "1rem" }}>
-      {ranges.map((r) => (
-        <button
-          key={r}
-          onClick={() => setRange(r)}
-          style={{
-            margin: "0 0.5rem",
-            padding: "0.4rem 1rem",
-            borderRadius: "0.5rem",
-            border: range === r ? "2px solid #71a4d9" : "1px solid #ccc",
-            background: range === r ? "#e3f0ff" : "#fff",
-            cursor: "pointer",
-          }}
-        >
-          {r === "all" ? "ALL" : r.toUpperCase()}
-        </button>
-      ))}
+{ranges.map((r) => (
+  <button
+    key={r}
+    onClick={() => setRange(r)}
+    style={{
+      margin: "0 0.5rem",
+      padding: "0.4rem 1rem",
+      borderRadius: "0.5rem",
+      border: `2px solid ${range === r ? COLORS.tsuyukusa : "#ccc"}`,
+      background: range === r ? COLORS.tsuyukusa : "#fff",
+      color: range === r ? "#fff" : "#333",
+      fontWeight: range === r ? "bold" : "normal",
+      cursor: "pointer",
+    }}
+  >
+    {r.charAt(0).toUpperCase() + r.slice(1)}
+  </button>
+))}
     </div>
 
     <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
       <Doughnut data={chartData} options={options} />
+
+<GraphCenterLabel
+  hasData={hasData}
+  totalSeconds={totalSeconds}
+  range={range}
+  now={now}
+/>
+
       <div style={{ marginTop: "1rem", fontSize: "1.2rem" }}>
         {hasData ? `合計: ${formatTime(totalSeconds)}` : "No Data"}
       </div>
