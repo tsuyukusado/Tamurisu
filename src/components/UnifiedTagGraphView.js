@@ -1,5 +1,5 @@
 // UnifiedTagGraphView.js
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import dayjs from "dayjs";
@@ -7,11 +7,27 @@ import utc from "dayjs/plugin/utc"; // ← これ！
 import isoWeek from "dayjs/plugin/isoWeek";
 import { COLORS } from "../constants/colors";
 import GraphCenterLabel from "./GraphCenterLabel";
+
+import ChartWithLegendWrapper from "./ChartWithLegendWrapper";
+
+
 dayjs.extend(isoWeek);
 
 dayjs.extend(utc); // ← 忘れずに！
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile;
+}
 
 function formatTime(seconds) {
   const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -119,7 +135,7 @@ const chartData = {
 
 const options = {
   plugins: {
-    legend: { position: "bottom" },
+    legend: { display: false }, // ← ここを変更！
     tooltip: {
       callbacks: {
         label: (ctx) => {
@@ -139,38 +155,57 @@ const options = {
   },
 };
 
+const isMobile = useIsMobile();
+
 return (
   <div style={{ textAlign: "center", paddingTop: "1rem" }}>
-    <div style={{ marginBottom: "1rem" }}>
-{ranges.map((r) => (
-  <button
-    key={r}
-    onClick={() => setRange(r)}
-    style={{
-      margin: "0 0.5rem",
-      padding: "0.4rem 1rem",
-      borderRadius: "0.5rem",
-      border: `2px solid ${range === r ? COLORS.tsuyukusa : "#ccc"}`,
-      background: range === r ? COLORS.tsuyukusa : "#fff",
-      color: range === r ? "#fff" : "#333",
-      fontWeight: range === r ? "bold" : "normal",
-      cursor: "pointer",
-    }}
-  >
-    {r.charAt(0).toUpperCase() + r.slice(1)}
-  </button>
-))}
-    </div>
 
-    <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
-      <Doughnut data={chartData} options={options} />
 
-<GraphCenterLabel
-  hasData={hasData}
-  totalSeconds={totalSeconds}
-  range={range}
-  now={now}
+<div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "0.5rem",
+    marginBottom: "1rem",
+  }}
+>
+  {ranges.map((r) => (
+    <button
+      key={r}
+      onClick={() => setRange(r)}
+      style={{
+        width: isMobile ? "60px" : "80px",
+        height: isMobile ? "28px" : "36px",
+        borderRadius: "0.5rem",
+        border: `2px solid ${range === r ? COLORS.tsuyukusa : "#ccc"}`,
+        background: range === r ? COLORS.tsuyukusa : "#fff",
+        color: range === r ? "#fff" : "#333",
+        fontWeight: range === r ? "bold" : "normal",
+        fontSize: isMobile ? "0.75rem" : "0.85rem",
+        cursor: "pointer",
+        textAlign: "center",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {r.charAt(0).toUpperCase() + r.slice(1)}
+    </button>
+  ))}
+</div>
+<div style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}>
+<ChartWithLegendWrapper
+  chart={<Doughnut data={chartData} options={options} />}
+  centerLabel={
+    <GraphCenterLabel
+      hasData={hasData}
+      totalSeconds={totalSeconds}
+      range={range}    // ← これ重要！
+      now={now}        // ← これも必須！
+      isDetail={false}
+    />
+  }
 />
+
 </div>
   </div>
 );

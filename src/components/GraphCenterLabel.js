@@ -39,7 +39,7 @@ function GraphCenterLabel({ hasData, totalSeconds, range = "all", now = dayjs(),
     <div
       style={{
         position: "absolute",
-        top: "47%",
+        top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
         fontSize: "0.9rem",

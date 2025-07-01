@@ -3,6 +3,7 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import GraphCenterLabel from "./GraphCenterLabel"; // ✅ 中央表示用
 import BackButton from "./BackButton";             // ✅ 戻るボタン用
+import ChartWithLegendWrapper from "./ChartWithLegendWrapper";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -16,13 +17,20 @@ function formatTime(seconds) {
 function DetailGraph({ tag, tasks, completedTasks, taskRecords, onBack }) { // ✅ onBack 追加
   const taskData = useMemo(() => {
     if (!tag) return [];
+    console.log("📛 tag:", tag);
     const allTasks = [...tasks, ...completedTasks];
     const filtered = allTasks.filter((task) => task.tags?.includes(tag));
+
+    console.log("🔖 allTasks:", allTasks);
+console.log("📦 filtered:", filtered);
 
     return filtered
       .map((task) => {
         const records = taskRecords?.[task.id] || [];
-        const total = records.reduce((a, b) => a + b, 0);
+const total = (records || []).reduce((sum, record) => sum + (record.duration || 0), 0);
+
+console.log(`🧮 task: ${task.title}, records:`, records, "→ total:", total);
+
         return { title: task.title, value: total };
       })
       .filter((d) => d.value > 0)
@@ -32,6 +40,7 @@ function DetailGraph({ tag, tasks, completedTasks, taskRecords, onBack }) { // �
   const totalSeconds = taskData.reduce((sum, d) => sum + d.value, 0);
 
   const chartData = {
+    
     labels: taskData.map((d) => d.title),
     datasets: [
       {
@@ -46,27 +55,30 @@ function DetailGraph({ tag, tasks, completedTasks, taskRecords, onBack }) { // �
     ],
   };
 
+const options = {
+  responsive: true,
+  plugins: {
+    legend: { display: false }, // ← ここを変更！
+    tooltip: {
+      callbacks: {
+        label: (ctx) => {
+          const value = ctx.raw;
+          return `${ctx.label}: ${formatTime(value)}`;
+        },
+      },
+    },
+  },
+  cutout: "50%",
+};
+
   return (
-    <div style={{ maxWidth: 400, margin: "0 auto", position: "relative" }}>
+    <div style={{ maxWidth: 700, margin: "0 auto", position: "relative" }}>
       <h3 style={{ textAlign: "center" }}>{tag}</h3>
-      <Doughnut
-        data={chartData}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { position: "bottom" },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const value = ctx.raw;
-                  return `${ctx.label}: ${formatTime(value)}`;
-                },
-              },
-            },
-          },
-          cutout: "50%",
-        }}
-      />
+
+<ChartWithLegendWrapper
+  chart={<Doughnut data={chartData} options={options} />}
+/>
+
       <GraphCenterLabel
         hasData={true}
         totalSeconds={totalSeconds}
