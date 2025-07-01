@@ -171,11 +171,7 @@ return (
   range={range}
   now={now}
 />
-
-      <div style={{ marginTop: "1rem", fontSize: "1.2rem" }}>
-        {hasData ? `合計: ${formatTime(totalSeconds)}` : "No Data"}
-      </div>
-    </div>
+</div>
   </div>
 );
 }
