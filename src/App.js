@@ -145,6 +145,7 @@ function App() {
         completed: false,
         tags: combinedTags,
         dueDate,
+        note: "" ,
       }]);
 
       setNewTask("");

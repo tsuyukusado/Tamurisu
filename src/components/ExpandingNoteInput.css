@@ -1,0 +1,16 @@
+.expanding-note-input {
+  width: 100%;
+  border: none;              /* 枠なし */
+  outline: none;             /* フォーカス時の枠もなし */
+  resize: none;              /* リサイズ禁止 */
+  overflow: hidden;
+  font-size: 1rem;
+  font-family: inherit;      /* 親のフォントを継承 */
+  background: transparent;   /* 背景なし */
+  padding: 0;                /* 完全にぴったりに */
+  line-height: 1.5;
+}
+
+.expanding-note-input:focus {
+  border-bottom-color: #71A4D9;
+}

@@ -4,6 +4,7 @@ import "./TaskDetail.css";
 import HybridDateInput from "./HybridDateInput";
 import BackButton from "./BackButton"; // ✅ 追加
 import TaskRecordList from "./TaskRecordList"; // ✅ 追加
+import ExpandingNoteInput from "./ExpandingNoteInput";
 
 function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {  // ✅ 追加確認
   const [newTag, setNewTag] = useState("");
@@ -12,6 +13,16 @@ function TaskDetail({ task, onClose, onUpdate, onUpdateTags, setTaskRecords }) {
   const [recordTime, setRecordTime] = useState(0); // 秒
   const [editedTime, setEditedTime] = useState(""); // "HH:MM:SS" 形式
   const [dueDate, setDueDate] = useState(task.dueDate || ""); // 日付形式
+const [note, setNote] = useState(task.note || "");
+
+useEffect(() => {
+  setNote(task.note || "");
+}, [task]);
+
+const handleNoteChange = (newNote) => {
+  setNote(newNote);
+  onUpdate({ ...task, note: newNote }); // 即時保存
+};
 
 useEffect(() => {
   setEditedTitle(task.title);
@@ -170,6 +181,10 @@ const handleTimeUpdate = () => {
       </div>
 
       <hr className="tag-divider" />
+
+      <div style={{ marginTop: "1rem" }}>
+  <ExpandingNoteInput value={note} onChange={handleNoteChange} />
+</div>
 
 {/* 記録一覧 */}
 <TaskRecordList taskId={task.id} onChange={setTaskRecords} />
