@@ -3,6 +3,7 @@ import { FaTrash, FaCalendarAlt } from "react-icons/fa";
 import HybridDateTimeInput from "./HybridDateTimeInput";
 import { AnimatePresence } from "framer-motion";
 import AnimatedItem from "./AnimatedItem";
+import FlexibleDateTimeInput from "./FlexibleDateTimeInput";
 
 
 
@@ -118,12 +119,9 @@ if (prev !== next) {
     return (
       <AnimatedItem key={rec.id} tag="tr">
         <td style={{ minWidth: "220px" }}>
-          <HybridDateTimeInput
+          <FlexibleDateTimeInput
             value={rec.timestamp}
-onChange={(val) => {
-  console.log("📅 timestamp changed:", val);
-  handleEdit(idx, "timestamp", val);
-}}
+            onChange={(val) => handleEdit(idx, "timestamp", val)}
           />
         </td>
         <td>
